@@ -1,0 +1,33 @@
+# Git相关
+.git
+.gitignore
+
+# Docker相关
+Dockerfile
+docker-compose.yml
+.dockerignore
+
+# 构建目录
+build/
+cmake-build-*/
+
+# 临时文件
+*.tmp
+*.log
+*.swp
+*.swo
+*~
+
+# IDE文件
+.vscode/
+.idea/
+*.vcxproj
+*.sln
+
+# 系统文件
+.DS_Store
+Thumbs.db
+
+# 文档
+README.md
+*.md

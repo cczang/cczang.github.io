@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<profiles xmlns="http://www.eprosima.com">
+    
+    <!-- ============================================================================= -->
+    <!-- HelloWorld Publisher 参与者配置 -->
+    <!-- ============================================================================= -->
+    <participant profile_name="HelloWorldPublisherProfile">
+        <domainId>0</domainId>
+        <rtps>
+            <name>HelloWorldPublisher</name>
+        </rtps>
+    </participant>
+    
+    <!-- ============================================================================= -->
+    <!-- HelloWorld Subscriber 参与者配置 -->
+    <!-- ============================================================================= -->
+    <participant profile_name="HelloWorldSubscriberProfile">
+        <domainId>0</domainId>
+        <rtps>
+            <name>HelloWorldSubscriber</name>
+        </rtps>
+    </participant>
+    
+    <!-- ============================================================================= -->
+    <!-- HelloWorld Publisher 配置 -->
+    <!-- ============================================================================= -->
+    <publisher profile_name="HelloWorldPublisher">
+        <qos>
+            <durability>
+                <kind>TRANSIENT_LOCAL</kind>
+            </durability>
+            <reliability>
+                <kind>RELIABLE</kind>
+            </reliability>
+        </qos>
+    </publisher>
+    
+    <!-- ============================================================================= -->
+    <!-- HelloWorld Subscriber 配置 -->
+    <!-- ============================================================================= -->
+    <subscriber profile_name="HelloWorldSubscriber">
+        <qos>
+            <durability>
+                <kind>TRANSIENT_LOCAL</kind>
+            </durability>
+            <reliability>
+                <kind>RELIABLE</kind>
+            </reliability>
+        </qos>
+    </subscriber>
+    
+    <!-- ============================================================================= -->
+    <!-- HelloWorld DataWriter 配置 -->
+    <!-- ============================================================================= -->
+    <data_writer profile_name="HelloWorldDataWriter">
+        <qos>
+            <durability>
+                <kind>TRANSIENT_LOCAL</kind>
+            </durability>
+            <reliability>
+                <kind>RELIABLE</kind>
+            </reliability>
+        </qos>
+        <topic>
+            <historyQos>
+                <kind>KEEP_LAST</kind>
+                <depth>10</depth>
+            </historyQos>
+            <resourceLimitsQos>
+                <max_samples>10</max_samples>
+                <max_instances>1</max_instances>
+                <max_samples_per_instance>10</max_samples_per_instance>
+            </resourceLimitsQos>
+        </topic>
+    </data_writer>
+    
+    <!-- ============================================================================= -->
+    <!-- HelloWorld DataReader 配置 -->
+    <!-- ============================================================================= -->
+    <data_reader profile_name="HelloWorldDataReader">
+        <qos>
+            <durability>
+                <kind>TRANSIENT_LOCAL</kind>
+            </durability>
+            <reliability>
+                <kind>RELIABLE</kind>
+            </reliability>
+        </qos>
+        <topic>
+            <historyQos>
+                <kind>KEEP_LAST</kind>
+                <depth>10</depth>
+            </historyQos>
+            <resourceLimitsQos>
+                <max_samples>10</max_samples>
+                <max_instances>1</max_instances>
+                <max_samples_per_instance>10</max_samples_per_instance>
+            </resourceLimitsQos>
+        </topic>
+    </data_reader>
+    
+</profiles>

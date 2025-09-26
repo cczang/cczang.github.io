@@ -1,0 +1,120 @@
+services:
+  # =============================================================================
+  # Fast-DDS 基础服务 (编译服务)
+  # =============================================================================
+  # 用途: 提供Fast-DDS开发环境和自动编译功能
+  # 功能: 包含Fast-DDS、FastCDR、fastddsgen等开发工具，自动扫描并编译所有测试用例
+  # 网络: 使用主机网络模式，便于DDS通信
+  # 卷挂载: 
+  #   - ./examples -> /opt/fast-dds/examples (源代码目录)
+  #   - ./build -> /opt/fast-dds/build (构建输出目录)
+  # 最终执行命令: 自动扫描examples目录，编译所有包含build.sh的测试用例
+  # 
+  # 等效的docker run命令:
+  # docker run --rm --name fast-dds-builder \
+  #   --network host \
+  #   -v ./examples:/opt/fast-dds/examples \
+  #   -v ./build:/opt/fast-dds/build \
+  #   -e DISPLAY=${DISPLAY:-:0} \
+  #   fast-dds:3.3.0 \
+  #   bash -c "cd /opt/fast-dds/examples && for dir in */; do [ -f \"\$$dir/build.sh\" ] && cd \"\$$dir\" && chmod +x build.sh && ./build.sh && cd ..; done"
+  # 注意: Docker Compose不支持auto_remove选项，--rm功能仅在docker run中可用
+  fast-dds-builder:
+    build:
+      context: .                    # 构建上下文为当前目录
+      dockerfile: Dockerfile        # 使用Dockerfile构建镜像
+    image: fast-dds:3.3.0          # 镜像标签
+    container_name: fast-dds-builder  # 容器名称
+    volumes:
+      - ./examples:/opt/fast-dds/examples  # 挂载示例代码目录
+    environment:
+      - DISPLAY=${DISPLAY:-:0}      # 设置显示环境变量
+    network_mode: host              # 使用主机网络模式
+    #ports:
+    #- "7400:7400/udp"
+    #- "7410:7410/udp"
+    #- "7550-7580:7550-7580/udp"
+    command: >
+      bash -c "cd /opt/fast-dds/examples && chmod +x build_all.sh && ./build_all.sh"
+
+  # =============================================================================
+  # HelloWorld Publisher 服务 (运行时服务)
+  # =============================================================================
+  # 用途: 运行DDS发布者，发送HelloWorld消息
+  # 功能: 直接运行已编译的HelloWorldPublisher程序
+  # 依赖: 需要先运行fast-dds-builder服务完成编译
+  # 网络: 使用主机网络模式，与subscriber通信
+  # 卷挂载: 与fast-dds-builder服务相同的卷挂载，共享编译结果
+  # 最终执行命令: 
+  #   cd /opt/fast-dds/examples/bin &&
+  #   ./HelloWorldPublisher 10
+  # 
+  # 等效的docker run命令:
+  # docker run --rm --name helloworld-publisher \
+  #   --network host \
+  #   -v ./examples:/opt/fast-dds/examples \
+  #   -v ./build:/opt/fast-dds/build \
+  #   -e DISPLAY=${DISPLAY:-:0} \
+  #   fast-dds:3.3.0 \
+  #   bash -c "cd /opt/fast-dds/examples/bin && ./HelloWorldPublisher 10"
+  # 注意: Docker Compose不支持auto_remove选项，--rm功能仅在docker run中可用
+  publisher:
+    build:
+      context: .                    # 构建上下文为当前目录
+      dockerfile: Dockerfile        # 使用Dockerfile构建镜像
+    image: fast-dds:3.3.0          # 镜像标签
+    container_name: helloworld-publisher  # 容器名称
+    volumes:
+      - ./examples:/opt/fast-dds/examples  # 挂载示例代码目录
+    environment:
+      - DISPLAY=${DISPLAY:-:0}      # 设置显示环境变量
+    #network_mode: host              # 使用主机网络模式
+    ports:
+    - "7400:7400/udp"
+    - "7410:7410/udp"
+    - "7550-7580:7550-7580/udp"
+    #depends_on:
+    #  - fast-dds-builder            # 依赖编译服务完成
+    command: >
+      bash -c "cd /opt/fast-dds/examples/bin && ./HelloWorldPublisher 10"
+
+  # =============================================================================
+  # HelloWorld Subscriber 服务 (运行时服务)
+  # =============================================================================
+  # 用途: 运行DDS订阅者，接收HelloWorld消息
+  # 功能: 直接运行已编译的HelloWorldSubscriber程序
+  # 依赖: 需要先运行fast-dds-builder服务完成编译
+  # 网络: 使用端口映射模式，与publisher通信
+  # 卷挂载: 与fast-dds-builder服务相同的卷挂载，共享编译结果
+  # 最终执行命令:
+  #   cd /opt/fast-dds/examples/bin &&
+  #   ./HelloWorldSubscriber 10
+  # 
+  # 等效的docker run命令:
+  # docker run --rm --name helloworld-subscriber \
+  #   -p 7400:7400/udp -p 7410:7410/udp -p 7550-7580:7550-7580/udp \
+  #   -v ./examples:/opt/fast-dds/examples \
+  #   -v ./build:/opt/fast-dds/build \
+  #   -e DISPLAY=${DISPLAY:-:0} \
+  #   fast-dds:3.3.0 \
+  #   bash -c "cd /opt/fast-dds/examples/bin && ./HelloWorldSubscriber 10"
+  # 注意: Docker Compose不支持auto_remove选项，--rm功能仅在docker run中可用
+  subscriber:
+    build:
+      context: .                    # 构建上下文为当前目录
+      dockerfile: Dockerfile        # 使用Dockerfile构建镜像
+    image: fast-dds:3.3.0          # 镜像标签
+    container_name: helloworld-subscriber  # 容器名称
+    volumes:
+      - ./examples:/opt/fast-dds/examples  # 挂载示例代码目录
+    environment:
+      - DISPLAY=${DISPLAY:-:0}      # 设置显示环境变量
+    #network_mode: host              # 使用主机网络模式
+    ports:
+    - "7400:7400/udp"
+    - "7410:7410/udp"
+    - "7550-7580:7550-7580/udp"
+    #depends_on:
+    #  - fast-dds-builder            # 依赖编译服务完成
+    command: >
+      bash -c "cd /opt/fast-dds/examples/bin && ./HelloWorldSubscriber 10"
